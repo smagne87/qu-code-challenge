@@ -6,6 +6,7 @@ interface IPlanetSate {
   planetsData: null | GetPlanetsResponse;
   sortKey: string;
   sortDirection: 'asc' | 'desc';
+  page: number;
 }
 
 function sortBy(key: string, direction: 'asc' | 'desc') {
@@ -26,6 +27,7 @@ export const usePlanetStore = defineStore('planets', {
     planetsData: null,
     sortKey: 'name',
     sortDirection: 'desc',
+    page: 1,
   }),
   getters: {
     planetsSorted: (state) => {
@@ -33,9 +35,12 @@ export const usePlanetStore = defineStore('planets', {
     },
   },
   actions: {
-    async getPlanets() {
+    async getPlanets(page?: number) {
       try {
-        this.planetsData = await planetsService.getPlanets();
+        this.planetsData = await planetsService.getPlanets({ page });
+        if (page) {
+          this.page = page;
+        }
       } catch (error) {
         return error;
       }

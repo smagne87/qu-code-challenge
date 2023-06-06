@@ -1,5 +1,6 @@
 <script lang="ts">
 import ColumnHeader from '@/components/ColumnHeader/ColumnHeader.vue';
+import PaginationComponent from '@/components/Pagination/PaginationComponent.vue';
 import { usePlanetStore } from '@/stores/planets';
 import { mapState, storeToRefs } from 'pinia';
 import { defineComponent } from 'vue';
@@ -15,15 +16,20 @@ export default defineComponent({
       store.updateSortKey(sortBy);
     };
 
+    const handlePageChange = (page: number) => {
+      store.getPlanets(page);
+    };
+
     return {
       planetsSorted,
-      handleColumnSortChange
+      handleColumnSortChange,
+      handlePageChange
     };
   },
   computed: {
-    ...mapState(usePlanetStore, ['sortDirection', 'sortKey']),
+    ...mapState(usePlanetStore, ['sortDirection', 'sortKey', 'page', 'planetsData']),
   },
-  components: { ColumnHeader }
+  components: { ColumnHeader, PaginationComponent }
 });
 </script>
 
@@ -55,11 +61,11 @@ export default defineComponent({
         </tr>
       </tbody>
     </table>
+    <PaginationComponent :page="page" :total-items="60" :on-page-click="handlePageChange" />
   </main>
 </template>
 
 <style scoped>
-
 .table {
   @apply w-full text-sm text-left text-gray-500 dark:text-gray-400;
 }
@@ -67,12 +73,15 @@ export default defineComponent({
 .table-headers {
   @apply text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400;
 }
+
 .table-rows {
   @apply bg-white border-b dark:bg-gray-800 dark:border-gray-700;
 }
+
 .special-column {
   @apply px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white;
 }
+
 .container {
   @apply p-3 bg-gray-500 min-w-full;
   height: calc(100vh - 45px);
